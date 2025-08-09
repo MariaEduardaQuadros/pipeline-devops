@@ -1,0 +1,8 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: "Exemplo de criação de bucket S3 com AWS CloudFormation"
+
+Resources:
+  MeuBucketS3:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub "meu-bucket-exemplo-${AWS::AccountId}-${AWS::Region}"

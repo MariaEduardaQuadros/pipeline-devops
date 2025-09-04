@@ -1,0 +1,29 @@
+Resources:
+  MyVPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.0.0.0/16
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      Tags:
+        - Key: Name
+          Value: DevOpsVPC
+
+  MySubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref MyVPC
+      CidrBlock: 10.0.1.0/24
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: DevOpsSubnet
+Outputs:
+  DevOpsVPCId:
+    Value: !Ref MyVPC
+    Export:
+      Name: DevOpsVPCId
+  DevOpsSubnetId:
+    Value: !Ref MySubnet
+    Export:
+      Name: DevOpsSubnetId

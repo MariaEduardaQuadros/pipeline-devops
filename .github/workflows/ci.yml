@@ -1,14 +1,29 @@
-name: CI Pipeline
+name: CI Pipeline - Python
 
-on: [push, pull_request]
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
 
 jobs:
-  build:
+  build-and-test:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout do código
         uses: actions/checkout@v3
 
-      - name: Verificar funcionamento
-        run: echo "CI executado com sucesso!"
+      - name: Configurar Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
 
+      - name: Instalar dependências
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+      - name: Rodar testes
+        run: |
+          if [ -d tests ]; then pytest --maxfail=5 --disable-warnings -q; else echo "Nenhum teste encontrado"; fi

@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: "2010-09-09"
-Description: "Template para criar uma instância EC2"
+Description: "Template para criar uma instância EC2 Free Tier"
 
 Parameters:
   KeyName:
@@ -12,14 +12,12 @@ Parameters:
     Default: t2.micro
     AllowedValues:
       - t2.micro
-      - t2.small
-      - t2.medium
-    ConstraintDescription: deve ser um tipo de instância válido.
+    ConstraintDescription: deve ser um tipo de instância Free Tier.
 
   LatestAmiId:
-    Description: Última AMI do Amazon Linux 2 (fornecida pela AWS via SSM)
-    Type: AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>
-    Default: /aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2
+    Description: AMI Amazon Linux 2023 Free Tier para us-east-1
+    Type: AWS::EC2::Image::Id
+    Default: ami-00ca32bbc84273381
 
 Resources:
   EC2Instance:
@@ -31,6 +29,8 @@ Resources:
       SecurityGroupIds:
         - !Ref InstanceSecurityGroup
       SubnetId: !ImportValue DevOps-SubnetPublica
+      CreditSpecification:
+        CpuCredits: standard  # Garante Free Tier
 
   InstanceSecurityGroup:
     Type: AWS::EC2::SecurityGroup

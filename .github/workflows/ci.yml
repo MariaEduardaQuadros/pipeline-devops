@@ -1,11 +1,13 @@
-name: CI Pipeline - Python
+name: CI Pipeline - Python + Deploy AWS
 
 on:
   push:
     branches: ["main"]
+  workflow_dispatch:
 
 jobs:
   build-and-test:
+    name: Build e Testes Python
     runs-on: ubuntu-latest
     steps:
       - name: Checkout do código
@@ -33,7 +35,7 @@ jobs:
           path: reports/junit.xml
 
   deploy-infra:
-    name: Deploy Infrastructure
+    name: Deploy Infraestrutura AWS
     runs-on: ubuntu-latest
     needs: build-and-test
 
@@ -44,24 +46,28 @@ jobs:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
-          aws-region: ${{ vars.AWS_REGION }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
 
-      - name: Deploy CloudFormation Stacks
+      - name: Deploy VPC
         run: |
           aws cloudformation deploy \
-            --template-file infra/vpc.yaml \
-            --stack-name minha-pipeline-vpc \
-            --no-fail-on-empty-changeset
+            --template-file infra/vpc.yml \
+            --stack-name devops-vpc \
+            --capabilities CAPABILITY_NAMED_IAM
 
+      - name: Deploy S3
+        run: |
           aws cloudformation deploy \
-            --template-file infra/s3.yaml \
-            --stack-name minha-pipeline-s3 \
-            --no-fail-on-empty-changeset
+            --template-file infra/s3.yml \
+            --stack-name devops-s3 \
+            --capabilities CAPABILITY_NAMED_IAM
 
+      - name: Deploy EC2
+        run: |
           aws cloudformation deploy \
-            --template-file infra/ec2.yaml \
-            --stack-name minha-pipeline-ec2 \
-            --capabilities CAPABILITY_IAM \
-            --no-fail-on-empty-changeset \
-            --parameter-overrides KeyName=MariaEduardaQuadros
+            --template-file infra/ec2.yml \
+            --stack-name devops-ec2 \
+            --capabilities CAPABILITY_NAMED_IAM \
+            --parameter-overrides KeyName=devops-key

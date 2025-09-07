@@ -26,6 +26,7 @@ O objetivo é configurar um **pipeline de integração contínua (CI)** e criar 
 ---
 
 ## ⚙️ Pipeline de Integração Contínua
+![CI Pipeline](https://github.com/MariaEduardaQuadros/pipeline-devops/actions/workflows/ci.yml/badge.svg)
 
 O pipeline é executado automaticamente nas seguintes situações:
 - Push para as branches principais (`main` ou `master`).

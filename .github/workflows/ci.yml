@@ -64,10 +64,11 @@ jobs:
             --stack-name devops-s3 \
             --capabilities CAPABILITY_NAMED_IAM
 
-      - name: Deploy EC2
-        run: |
-          aws cloudformation deploy \
-            --template-file infra/ec2.yml \
-            --stack-name devops-ec2 \
-            --capabilities CAPABILITY_NAMED_IAM \
-            --parameter-overrides KeyName=devops-key
+      # EC2 porque ela já foi criada manualmente
+      # - name: Deploy EC2
+      #   run: |
+      #     aws cloudformation deploy \
+      #       --template-file infra/ec2.yml \
+      #       --stack-name devops-ec2 \
+      #       --capabilities CAPABILITY_NAMED_IAM \
+      #       --parameter-overrides KeyName=devops-key

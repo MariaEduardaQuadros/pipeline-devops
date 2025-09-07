@@ -1,50 +1,57 @@
-AWSTemplateFormatVersion: '2010-09-09'
-Description: "EC2 Instance conectada à VPC/Subnet exportadas pelo stack de rede"
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "Template para criar uma instância EC2"
 
 Parameters:
+  KeyName:
+    Description: Nome do par de chaves para acessar a instância
+    Type: AWS::EC2::KeyPair::KeyName
+
   InstanceType:
+    Description: Tipo da instância EC2
     Type: String
     Default: t2.micro
-    Description: "Tipo da instância"
-  ImageId:
-    Type: String
-    Default: ami-08c40ec9ead489470
-    Description: "AMI (atenção: é region-specific; atualize se necessário)"
-  SSHAllowCidr:
-    Type: String
-    Default: 0.0.0.0/0
-    Description: "CIDR permitido para SSH (recomendo colocar seu IP em produção)"
+    AllowedValues:
+      - t2.micro
+      - t2.small
+      - t2.medium
+    ConstraintDescription: deve ser um tipo de instância válido.
+
+  LatestAmiId:
+    Description: Última AMI do Amazon Linux 2 (fornecida pela AWS via SSM)
+    Type: AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>
+    Default: /aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2
 
 Resources:
+  EC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: !Ref InstanceType
+      KeyName: !Ref KeyName
+      ImageId: !Ref LatestAmiId
+      SecurityGroupIds:
+        - !Ref InstanceSecurityGroup
+      SubnetId: !ImportValue DevOps-SubnetPublica
+
   InstanceSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: "Enable SSH and HTTP access"
-      VpcId: !ImportValue DevOpsVPCId
+      GroupDescription: Habilitar acesso SSH e HTTP
+      VpcId: !ImportValue DevOps-VPC
       SecurityGroupIngress:
         - IpProtocol: tcp
           FromPort: 22
           ToPort: 22
-          CidrIp: !Ref SSHAllowCidr
+          CidrIp: 0.0.0.0/0
         - IpProtocol: tcp
           FromPort: 80
           ToPort: 80
           CidrIp: 0.0.0.0/0
 
-  EC2Instance:
-    Type: AWS::EC2::Instance
-    Properties:
-      InstanceType: !Ref InstanceType
-      ImageId: !Ref ImageId
-      SecurityGroupIds:
-        - !Ref InstanceSecurityGroup
-      SubnetId: !ImportValue DevOpsSubnetId
-
 Outputs:
-  EC2InstanceId:
-    Description: "ID da instância EC2"
+  InstanceId:
+    Description: ID da instância EC2
     Value: !Ref EC2Instance
 
-  EC2PublicIP:
-    Description: "Public IP da instância"
+  PublicIP:
+    Description: Endereço IP público da instância
     Value: !GetAtt EC2Instance.PublicIp

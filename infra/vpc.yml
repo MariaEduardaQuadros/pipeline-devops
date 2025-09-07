@@ -1,3 +1,6 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: "VPC e Subnet para ambiente DevOps (exporta IDs para outros stacks)"
+
 Resources:
   MyVPC:
     Type: AWS::EC2::VPC
@@ -18,12 +21,16 @@ Resources:
       Tags:
         - Key: Name
           Value: DevOpsSubnet
+
 Outputs:
   DevOpsVPCId:
+    Description: "VPC Id"
     Value: !Ref MyVPC
     Export:
       Name: DevOpsVPCId
+
   DevOpsSubnetId:
+    Description: "Subnet Id"
     Value: !Ref MySubnet
     Export:
       Name: DevOpsSubnetId

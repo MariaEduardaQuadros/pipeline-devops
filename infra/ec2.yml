@@ -1,29 +1,50 @@
-Resources:
-  EC2Instance:
-    Type: AWS::EC2::Instance
-    Properties:
-      InstanceType: t2.micro
-      ImageId: ami-08c40ec9ead489470  # Amazon Linux 2 (us-east-1)
-      SecurityGroupIds:
-        - !Ref InstanceSecurityGroup
-      SubnetId: !ImportValue DevOpsSubnetId
+AWSTemplateFormatVersion: '2010-09-09'
+Description: "EC2 Instance conectada à VPC/Subnet exportadas pelo stack de rede"
 
+Parameters:
+  InstanceType:
+    Type: String
+    Default: t2.micro
+    Description: "Tipo da instância"
+  ImageId:
+    Type: String
+    Default: ami-08c40ec9ead489470
+    Description: "AMI (atenção: é region-specific; atualize se necessário)"
+  SSHAllowCidr:
+    Type: String
+    Default: 0.0.0.0/0
+    Description: "CIDR permitido para SSH (recomendo colocar seu IP em produção)"
+
+Resources:
   InstanceSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: Enable SSH and HTTP access
+      GroupDescription: "Enable SSH and HTTP access"
       VpcId: !ImportValue DevOpsVPCId
       SecurityGroupIngress:
         - IpProtocol: tcp
           FromPort: 22
           ToPort: 22
-          CidrIp: 0.0.0.0/0
+          CidrIp: !Ref SSHAllowCidr
         - IpProtocol: tcp
           FromPort: 80
           ToPort: 80
           CidrIp: 0.0.0.0/0
 
+  EC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: !Ref InstanceType
+      ImageId: !Ref ImageId
+      SecurityGroupIds:
+        - !Ref InstanceSecurityGroup
+      SubnetId: !ImportValue DevOpsSubnetId
+
 Outputs:
+  EC2InstanceId:
+    Description: "ID da instância EC2"
+    Value: !Ref EC2Instance
+
   EC2PublicIP:
-    Description: Public IP da instância
+    Description: "Public IP da instância"
     Value: !GetAtt EC2Instance.PublicIp

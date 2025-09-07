@@ -1,5 +1,15 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: "Bucket S3 para artefatos (nome baseado em account+region para evitar conflito)"
+
 Resources:
   S3Bucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: meu-bucket-devops-teste
+      BucketName: !Sub "meu-bucket-devops-teste-${AWS::AccountId}-${AWS::Region}"
+
+Outputs:
+  S3BucketName:
+    Value: !Ref S3Bucket
+    Description: "Nome do bucket S3 criado"
+    Export:
+      Name: DevOpsS3BucketName

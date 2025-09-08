@@ -50,19 +50,20 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
 
-      - name: Deploy VPC
-        run: |
-          aws cloudformation deploy \
-            --template-file infra/vpc.yml \
-            --stack-name devops-vpc \
-            --capabilities CAPABILITY_NAMED_IAM
+      # Comentando o deploy AWS porque os recursos já existem
+      # - name: Deploy VPC
+      #   run: |
+      #     aws cloudformation deploy \
+      #       --template-file infra/vpc.yml \
+      #       --stack-name devops-vpc \
+      #       --capabilities CAPABILITY_NAMED_IAM
 
-      - name: Deploy S3
-        run: |
-          aws cloudformation deploy \
-            --template-file infra/s3.yml \
-            --stack-name devops-s3 \
-            --capabilities CAPABILITY_NAMED_IAM
+      # - name: Deploy S3
+      #   run: |
+      #     aws cloudformation deploy \
+      #       --template-file infra/s3.yml \
+      #       --stack-name devops-s3 \
+      #       --capabilities CAPABILITY_NAMED_IAM
 
       # EC2 porque ela já foi criada manualmente
       # - name: Deploy EC2
